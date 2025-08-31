@@ -23,10 +23,27 @@ const Users = ({userPromise}) => {
         .then(res => res.json())
         .then(data => {
             console.log('after add new user', data);
-            const addedUser = { ...addUser, _id: data.insertedId };
-            const newUser = [...users, addedUser];
+            // const addedUser = { ...addUser, _id: data.insertedId };
+            addUser._id = data.insertedId; 
+            const newUser = [...users, addUser];
             setUsers(newUser);
             e.target.reset();
+        })
+    }
+
+    const handleUserDelete = (id) => {
+        console.log('delete this user', id);
+        fetch(`http://localhost:3000/users/${id}`, {
+            method: 'DELETE'
+
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.deletedCount){
+                const remainingUser = users.filter(user => user._id !== id);
+                setUsers(remainingUser)
+            }
+            alert('delete user')
         })
     }
 
@@ -47,7 +64,9 @@ const Users = ({userPromise}) => {
                     {
                         users.map(user => 
                             <div key={user._id}>
-                                <p>{user.name} || {user.email}</p>
+                                <p>{user.name} || {user.email}
+                                <button onClick={ () => handleUserDelete (user._id)}>Delete</button>
+                                </p>
                             </div>
                         )
                     }
